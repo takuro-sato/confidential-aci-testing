@@ -204,8 +204,9 @@ def parse_bicep(
         ],
         check=True,
         stdout=subprocess.PIPE,
+        text=True,
     )
-    res_json = json.loads(res.stdout.decode())
+    res_json = json.loads(res.stdout)
     arm_template_json = _resolve_arm_functions(
         json.loads(res_json["templateJson"]),
         json.loads(res_json["parametersJson"]),

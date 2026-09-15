@@ -38,6 +38,20 @@ WCOW_ALLOW_ALL_POLICY_REGO_PATH = os.path.join(
     "wcow_allow_all_policy.rego",
 )
 
+PRERELEASE_POLICY_API_ENV = "C_ACI_TESTING_PRERELEASE_POLICY_API"
+
+
+def _prerelease_policy_api_enabled(explicit: bool) -> bool:
+    return explicit or os.getenv(PRERELEASE_POLICY_API_ENV, "").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+
+
+def _az_command() -> str:
+    return "az.bat" if os.name == "nt" else "az"
+
 
 def policies_gen(
     target_path: str,
@@ -53,6 +67,7 @@ def policies_gen(
     prerelease_policy_api: bool = False,
     **kwargs,
 ):
+    prerelease_policy_api = _prerelease_policy_api_enabled(prerelease_policy_api)
 
     # Inform the user of the policy type
     print(f"Using the policy type: {policy_type}")
@@ -133,14 +148,16 @@ def policies_gen(
                 json.dump({"resources": [cg_for_confcom]}, file, indent=2)
 
             print("Calling acipolicygen and saving policy to file")
-            subprocess.run(["az", "extension", "add", "--name", "confcom", "--yes"], check=True)
+            az_command = _az_command()
+            subprocess.run([az_command, "extension", "add", "--name", "confcom", "--yes"], check=True)
             args = [
-                "az",
+                az_command,
                 "confcom",
                 "acipolicygen",
                 "-a",
                 tmp_arm_template_path,
                 "--outraw-pretty-print",
+                *(["--platform", "windows/amd64"] if is_wcow else []),
                 *(["--debug-mode"] if policy_type == "debug" else []),
                 *(["--include-fragments", "--fragments-json", fragments_json] if fragments_json else []),
                 *(["--infrastructure-svn", str(infrastructure_svn)] if infrastructure_svn is not None else []),

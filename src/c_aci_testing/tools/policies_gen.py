@@ -50,6 +50,7 @@ def policies_gen(
     policy_type: str,
     fragments_json: str | None = None,
     infrastructure_svn: int | None = None,
+    prerelease_policy_api: bool = False,
     **kwargs,
 ):
 
@@ -143,6 +144,7 @@ def policies_gen(
                 *(["--debug-mode"] if policy_type == "debug" else []),
                 *(["--include-fragments", "--fragments-json", fragments_json] if fragments_json else []),
                 *(["--infrastructure-svn", str(infrastructure_svn)] if infrastructure_svn is not None else []),
+                *(["--prerelease-policy-api"] if prerelease_policy_api else []),
             ]
             print("Running: " + " ".join(args), flush=True)
             sys.stderr.flush()

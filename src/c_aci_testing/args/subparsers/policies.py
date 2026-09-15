@@ -17,6 +17,7 @@ from ..parameters.tag import parse_tag
 from ..parameters.target_path import parse_target_path
 from ..parameters.fragments_json import parse_fragments_json
 from ..parameters.infrastructure_svn import parse_infrastructure_svn
+from ..parameters.prerelease_policy_api import parse_prerelease_policy_api
 
 
 def subparse_policies(policies: argparse.ArgumentParser):
@@ -34,3 +35,4 @@ def subparse_policies(policies: argparse.ArgumentParser):
     parse_policy_type(gen)
     parse_fragments_json(gen)
     parse_infrastructure_svn(gen)
+    parse_prerelease_policy_api(gen)

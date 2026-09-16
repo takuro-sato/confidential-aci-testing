@@ -53,6 +53,11 @@ def _az_command() -> str:
     return "az.bat" if os.name == "nt" else "az"
 
 
+def _write_policy_file(policy_path: str, policy: str):
+    with open(policy_path, "w", encoding="utf-8", newline="") as file:
+        file.write(policy)
+
+
 def policies_gen(
     target_path: str,
     deployment_name: str,
@@ -173,8 +178,8 @@ def policies_gen(
             policy = res.stdout.decode()
             os.remove(tmp_arm_template_path)
 
-        with open(os.path.join(target_path, f"policy_{container_group_id}.rego"), "w") as file:
-            file.write(policy)
+        policy_path = os.path.join(target_path, f"policy_{container_group_id}.rego")
+        _write_policy_file(policy_path, policy)
 
         policies[container_group_id] = base64.b64encode(policy.encode()).decode()
 
